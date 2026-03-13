@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- max-scale=1.0 prevents mobile Safari from zooming in when focusing inputs -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher's Tally</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animation to replicate the React slide-in effect */
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-slide-in {
+            animation: fadeSlideIn 0.2s ease-out forwards;
+        }
+        /* Custom height to ensure it fits mobile viewports perfectly */
+        .h-dvh {
+            height: 100vh; /* Fallback */
+            height: 100dvh;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
+
+    <div class="h-dvh w-full flex flex-col overflow-hidden">
+      
+      <!-- Top Header -->
+      <header class="bg-indigo-600 text-white p-4 flex justify-between items-center shrink-0 shadow-md z-20">
+        <div class="flex items-center gap-2">
+          <!-- Calculator Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+          <h1 class="text-lg font-bold">Teacher's Tally</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button id="btn-clear" onclick="clearAll()" class="p-2 text-indigo-100 hover:text-white disabled:opacity-50 transition-colors" title="Reset All" disabled>
+            <!-- RotateCcw Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <button id="btn-export" onclick="exportCSV()" class="p-2 text-indigo-100 hover:text-white disabled:opacity-50 transition-colors" title="Export CSV" disabled>
+            <!-- Download Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Sticky Grand Total -->
+      <div class="bg-white p-4 border-b border-slate-200 shadow-sm shrink-0 z-10 flex justify-between items-center">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Papers: <span id="papers-count">0</span></p>
+          <p class="text-sm font-semibold text-slate-500 uppercase tracking-wider mt-1">Grand Total</p>
+        </div>
+        <div class="text-4xl font-extrabold text-indigo-600" id="grand-total">
+          0
+        </div>
+      </div>
+
+      <!-- Scrollable List Area -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 relative" id="list-area">
+        <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-400">
+          <p class="text-center">No marks yet.<br/>Type below to start.</p>
+        </div>
+        <div id="entries-container" class="space-y-3 hidden"></div>
+        <div id="list-end" class="h-4"></div> <!-- Spacer for scrolling -->
+      </div>
+
+      <!-- Sticky Bottom Input Area -->
+      <div class="bg-white p-4 border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0 pb-safe">
+        <div class="flex gap-3 max-w-md mx-auto">
+          <input
+            id="main-input"
+            type="number"
+            inputmode="decimal"
+            placeholder="Enter mark..."
+            class="flex-1 bg-slate-100 border-none rounded-xl px-4 py-4 text-2xl font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none"
+          />
+          <button 
+            id="btn-add"
+            onclick="addMark()"
+            class="bg-indigo-600 text-white p-4 rounded-xl font-bold flex items-center justify-center disabled:opacity-50 disabled:bg-slate-400 active:bg-indigo-700 transition-colors shadow-md"
+            disabled
+          >
+            <!-- Plus Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+        // State
+        let entries = [];
+        let editingId = null;
+        let editMark = '';
+
+        // DOM Elements
+        const mainInput = document.getElementById('main-input');
+        const btnAdd = document.getElementById('btn-add');
+        const btnClear = document.getElementById('btn-clear');
+        const btnExport = document.getElementById('btn-export');
+        const listArea = document.getElementById('list-area');
+        const entriesContainer = document.getElementById('entries-container');
+        const emptyState = document.getElementById('empty-state');
+        const grandTotalEl = document.getElementById('grand-total');
+        const papersCountEl = document.getElementById('papers-count');
+        const listEnd = document.getElementById('list-end');
+
+        // Icons as reusable strings
+        const iconTrash = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`;
+        const iconPencil = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`;
+        const iconCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const iconX = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+
+        // Input listeners
+        mainInput.addEventListener('input', () => {
+            btnAdd.disabled = mainInput.value.trim() === '';
+        });
+
+        mainInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addMark();
+            }
+        });
+
+        function addMark() {
+            const val = mainInput.value;
+            const markValue = parseFloat(val);
+            
+            if (!isNaN(markValue) && val.trim() !== '') {
+                const newEntry = {
+                    id: Date.now(),
+                    number: entries.length + 1,
+                    mark: markValue
+                };
+                
+                entries.push(newEntry);
+                mainInput.value = '';
+                btnAdd.disabled = true;
+                
+                render();
+                
+                // Auto-scroll to bottom
+                setTimeout(() => {
+                    listEnd.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+                
+                mainInput.focus();
+            }
+        }
+
+        function deleteEntry(idToRemove) {
+            entries = entries.filter(entry => entry.id !== idToRemove);
+            render();
+            mainInput.focus();
+        }
+
+        function startEditing(id, currentMark) {
+            editingId = id;
+            editMark = currentMark.toString();
+            render();
+        }
+
+        function handleEditInput(val) {
+            editMark = val;
+        }
+
+        function handleEditKey(e) {
+            if (e.key === 'Enter') saveEdit();
+            if (e.key === 'Escape') cancelEdit();
+        }
+
+        function saveEdit() {
+            const newMarkValue = parseFloat(editMark);
+            if (!isNaN(newMarkValue) && editMark.trim() !== '') {
+                entries = entries.map(entry => 
+                    entry.id === editingId ? { ...entry, mark: newMarkValue } : entry
+                );
+            }
+            editingId = null;
+            editMark = '';
+            render();
+            mainInput.focus();
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            editMark = '';
+            render();
+            mainInput.focus();
+        }
+
+        function clearAll() {
+            if (entries.length > 0 && confirm("Clear all marks? This cannot be undone.")) {
+                entries = [];
+                mainInput.value = '';
+                btnAdd.disabled = true;
+                render();
+                mainInput.focus();
+            }
+        }
+
+        function exportCSV() {
+            if (entries.length === 0) return;
+
+            const total = entries.reduce((sum, entry) => sum + entry.mark, 0);
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Entry Number,Mark\n";
+            
+            entries.forEach((e) => {
+                csvContent += `${e.number},${e.mark}\n`;
+            });
+            
+            csvContent += `\nTotal,${total}`;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "marks_tally.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function render() {
+            // Update Totals and Counts
+            const total = entries.reduce((sum, entry) => sum + entry.mark, 0);
+            grandTotalEl.innerText = total % 1 !== 0 ? total.toFixed(2) : total;
+            papersCountEl.innerText = entries.length;
+
+            // Update Top Buttons
+            const hasEntries = entries.length > 0;
+            btnClear.disabled = !hasEntries;
+            btnExport.disabled = !hasEntries;
+
+            // Manage Empty State
+            if (hasEntries) {
+                emptyState.classList.add('hidden');
+                entriesContainer.classList.remove('hidden');
+            } else {
+                emptyState.classList.remove('hidden');
+                entriesContainer.classList.add('hidden');
+            }
+
+            // Render List
+            entriesContainer.innerHTML = entries.map(entry => {
+                if (editingId === entry.id) {
+                    return `
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-indigo-50 border border-indigo-200 shadow-sm">
+                            <div class="flex items-center gap-3 flex-1">
+                                <span class="text-xs font-bold text-indigo-400 w-6">#${entry.number}</span>
+                                <input 
+                                    type="number"
+                                    inputmode="decimal"
+                                    value="${editMark}"
+                                    oninput="handleEditInput(this.value)"
+                                    onkeydown="handleEditKey(event)"
+                                    id="edit-input"
+                                    class="w-full bg-white border border-indigo-300 rounded-lg px-3 py-2 text-xl font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                            </div>
+                            <div class="flex items-center gap-1 ml-2">
+                                <button onclick="saveEdit()" class="p-3 text-green-600 hover:bg-green-100 rounded-lg transition-colors">
+                                    ${iconCheck}
+                                </button>
+                                <button onclick="cancelEdit()" class="p-3 text-slate-400 hover:bg-slate-200 rounded-lg transition-colors">
+                                    ${iconX}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 shadow-sm animate-fade-slide-in">
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-bold text-slate-400 w-6">#${entry.number}</span>
+                                <span class="text-xl font-bold text-slate-700">${entry.mark}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <button onclick="startEditing(${entry.id}, ${entry.mark})" class="p-3 text-slate-300 hover:text-indigo-500 active:bg-indigo-50 rounded-lg transition-colors">
+                                    ${iconPencil}
+                                </button>
+                                <button onclick="deleteEntry(${entry.id})" class="p-3 text-slate-300 hover:text-red-500 active:bg-red-50 rounded-lg transition-colors">
+                                    ${iconTrash}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // Focus management for inline editing
+            if (editingId) {
+                const editInput = document.getElementById('edit-input');
+                if (editInput) {
+                    editInput.focus();
+                    // Move cursor to the end of the text
+                    const valLength = editInput.value.length;
+                    editInput.setSelectionRange(valLength, valLength);
+                }
+            }
+        }
+
+        // Initial focus setup
+        window.addEventListener('load', () => {
+            mainInput.focus();
+        });
+
+    </script>
+</body>
+</html>
