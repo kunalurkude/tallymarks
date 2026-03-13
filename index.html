@@ -56,11 +56,6 @@
             background-size: 100%;
             transition: background 0s;
         }
-
-        /* Progress bar animation */
-        .timer-active {
-            transition: width 5s linear;
-        }
     </style>
 </head>
 <body class="bg-background text-gray-900 h-[100dvh] flex flex-col overflow-hidden select-none">
@@ -72,15 +67,32 @@
             <h1 class="text-xl font-medium tracking-wide">Tally Pro</h1>
         </div>
         <div class="flex items-center gap-1">
+            
+            <!-- Dynamic Timing Selector -->
+            <div class="relative flex items-center bg-white/10 rounded-full hover:bg-white/20 transition-colors px-2 py-1 mr-1 shadow-inner" title="Set Auto-Add Speed">
+                <span class="material-symbols-rounded text-[18px] mr-1 opacity-80">speed</span>
+                <select id="timer-delay-select" class="bg-transparent text-white text-sm font-bold outline-none appearance-none cursor-pointer pr-5 relative z-10 w-[3ch]">
+                    <option value="1000" class="text-gray-900 font-medium">1s</option>
+                    <option value="2000" class="text-gray-900 font-medium">2s</option>
+                    <option value="3000" class="text-gray-900 font-medium">3s</option>
+                    <option value="4000" class="text-gray-900 font-medium">4s</option>
+                    <option value="5000" class="text-gray-900 font-medium" selected>5s</option>
+                    <option value="10000" class="text-gray-900 font-medium">10s</option>
+                </select>
+                <span class="material-symbols-rounded text-[16px] absolute right-1.5 pointer-events-none opacity-80">arrow_drop_down</span>
+            </div>
+
             <button id="toggle-auto-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center" title="Toggle Auto-Add">
-                <!-- Icon changes dynamically via JS -->
                 <span class="material-symbols-rounded" id="auto-icon">timer</span>
             </button>
             <button id="export-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center disabled:opacity-50" title="Export CSV">
                 <span class="material-symbols-rounded">download</span>
             </button>
-            <button id="clear-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center disabled:opacity-50" title="Clear All">
+            <button id="clear-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center disabled:opacity-50" title="Clear All Marks">
                 <span class="material-symbols-rounded">delete_sweep</span>
+            </button>
+            <button id="full-reset-btn" class="p-2 rounded-full hover:bg-error/80 active:bg-error transition-colors flex items-center justify-center" title="Full App Reset">
+                <span class="material-symbols-rounded">restart_alt</span>
             </button>
         </div>
     </header>
@@ -116,7 +128,7 @@
         
         <!-- Timer Progress Indicator -->
         <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 overflow-hidden">
-            <div id="timer-bar" class="h-full bg-secondary w-0"></div>
+            <div id="timer-bar" class="h-full bg-secondary w-0 origin-left"></div>
         </div>
 
         <div class="p-4 flex gap-3 max-w-md mx-auto items-center">
@@ -147,6 +159,7 @@
         let entries = [];
         let autoAddEnabled = true;
         let autoAddTimeout = null;
+        let autoAddDelay = 5000; // Default to 5 seconds
         let editingId = null;
 
         // --- DOM Elements ---
@@ -158,10 +171,12 @@
         const paperCountEl = document.getElementById('paper-count');
         const timerBar = document.getElementById('timer-bar');
         const toggleAutoBtn = document.getElementById('toggle-auto-btn');
+        const timerDelaySelect = document.getElementById('timer-delay-select');
         const autoIcon = document.getElementById('auto-icon');
         const statusBanner = document.getElementById('status-banner');
         const exportBtn = document.getElementById('export-btn');
         const clearBtn = document.getElementById('clear-btn');
+        const fullResetBtn = document.getElementById('full-reset-btn');
 
         // --- Initialization ---
         input.focus();
@@ -179,8 +194,30 @@
         toggleAutoBtn.addEventListener('click', toggleAutoAdd);
         clearBtn.addEventListener('click', clearAll);
         exportBtn.addEventListener('click', exportCSV);
+        fullResetBtn.addEventListener('click', fullReset);
+        
+        // Listen for user changing the delay timer speed
+        timerDelaySelect.addEventListener('change', (e) => {
+            autoAddDelay = parseInt(e.target.value);
+            updateBannerText();
+            
+            // If currently typing, restart timer with new delay immediately
+            if (autoAddEnabled && input.value.trim() !== '') {
+                clearAutoTimer();
+                startAutoTimer();
+            }
+            input.focus();
+        });
 
         // --- Core Functions ---
+
+        function updateBannerText() {
+            if (autoAddEnabled) {
+                statusBanner.innerText = `Auto-add is enabled (${autoAddDelay / 1000} seconds)`;
+            } else {
+                statusBanner.innerText = 'Auto-add is paused';
+            }
+        }
 
         function handleInput(e) {
             const val = e.target.value.trim();
@@ -195,22 +232,23 @@
         }
 
         function startAutoTimer() {
-            // CSS Animation for progress bar
-            timerBar.classList.remove('timer-active');
+            // Reset CSS animation
+            timerBar.style.transition = 'none';
             timerBar.style.width = '100%';
             
-            // Force browser reflow to restart animation
+            // Force browser reflow to restart animation seamlessly
             void timerBar.offsetWidth; 
             
-            timerBar.classList.add('timer-active');
+            // Set dynamic transition duration based on user selection
+            timerBar.style.transition = `width ${autoAddDelay}ms linear`;
             timerBar.style.width = '0%';
 
-            // 5 Second Countdown
+            // Start Countdown
             autoAddTimeout = setTimeout(() => {
                 if (input.value.trim() !== '') {
                     addMark();
                 }
-            }, 5000);
+            }, autoAddDelay);
         }
 
         function clearAutoTimer() {
@@ -218,7 +256,7 @@
                 clearTimeout(autoAddTimeout);
                 autoAddTimeout = null;
             }
-            timerBar.classList.remove('timer-active');
+            timerBar.style.transition = 'none';
             timerBar.style.width = '0%';
         }
 
@@ -228,18 +266,18 @@
             if (autoAddEnabled) {
                 autoIcon.innerText = 'timer';
                 autoIcon.classList.remove('opacity-50');
-                statusBanner.innerText = 'Auto-add is enabled (5 seconds)';
                 statusBanner.classList.remove('bg-gray-600', 'h-0', 'py-0');
                 statusBanner.classList.add('bg-primary-dark', 'h-6', 'py-1');
+                updateBannerText();
                 
                 // If there's text in input, start timer immediately
                 if (input.value.trim() !== '') startAutoTimer();
             } else {
                 autoIcon.innerText = 'timer_off';
                 autoIcon.classList.add('opacity-50');
-                statusBanner.innerText = 'Auto-add is paused';
                 statusBanner.classList.remove('bg-primary-dark');
                 statusBanner.classList.add('bg-gray-600');
+                updateBannerText();
                 
                 // Hide banner after 2 seconds
                 setTimeout(() => {
@@ -288,6 +326,30 @@
                 input.value = '';
                 addBtn.disabled = true;
                 clearAutoTimer();
+                renderList();
+            }
+            input.focus();
+        }
+
+        function fullReset() {
+            if (confirm("Perform a full reset? This will clear all marks and restore default settings.")) {
+                // Clear marks
+                entries = [];
+                input.value = '';
+                addBtn.disabled = true;
+                clearAutoTimer();
+                
+                // Reset settings to default
+                autoAddDelay = 5000;
+                timerDelaySelect.value = "5000";
+                
+                // Re-enable auto add if it was disabled
+                if (!autoAddEnabled) {
+                    toggleAutoAdd(); // This toggles it back to true and updates the UI
+                } else {
+                    updateBannerText();
+                }
+                
                 renderList();
             }
             input.focus();
