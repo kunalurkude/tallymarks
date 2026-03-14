@@ -1,0 +1,21 @@
+  {
+  "name": "Teacher's Tally Pro",
+  "short_name": "Tally Pro",
+  "description": "Rapidly tally exam papers with auto-add features.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F5F5F6",
+  "theme_color": "#6200EE",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
