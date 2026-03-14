@@ -66,7 +66,7 @@
 <body class="bg-background text-gray-900 h-[100dvh] flex flex-col overflow-hidden select-none">
 
     <!-- Material App Bar -->
-    <header class="bg-primary text-white shadow-md z-20 flex justify-between items-center px-4 py-3 shrink-0">
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary text-white shadow-md z-50 flex justify-between items-center px-4 h-[64px]">
         <div class="flex items-center gap-2">
             <span class="material-symbols-rounded text-3xl">calculate</span>
             <h1 class="text-xl font-medium tracking-wide">Tally Pro</h1>
@@ -94,7 +94,7 @@
     </header>
 
     <!-- Scrollable List Area -->
-    <main id="list-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+    <main id="list-container" class="flex-1 overflow-y-auto p-4 space-y-3 mt-[64px]">
         <!-- Empty State -->
         <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400">
             <span class="material-symbols-rounded text-6xl mb-2 opacity-50">post_add</span>
