@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher's Tally Pro</title>
     
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#6200EE">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    
     <!-- Google Fonts: Montserrat & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +73,7 @@
         </div>
         <div class="flex items-center gap-2">
             
-            <!-- Dynamic Timing Selector -->
+            <!-- Dynamic Timing Selector with Custom Option -->
             <div class="relative flex items-center bg-white/10 rounded-full hover:bg-white/20 transition-colors px-2 py-1 shadow-inner" title="Set Auto-Add Speed">
                 <span class="material-symbols-rounded text-[18px] mr-1 opacity-80">speed</span>
                 <select id="timer-delay-select" class="bg-transparent text-white text-sm font-bold outline-none appearance-none cursor-pointer pr-5 relative z-10 w-[4ch]">
@@ -101,7 +106,7 @@
     <!-- Bottom Action Area (Sticky at the bottom) -->
     <footer class="bg-surface shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-20 shrink-0 relative flex flex-col pb-safe">
         
-        <!-- MOVED HERE: Grand Total Card -->
+        <!-- Grand Total Card directly above keyboard -->
         <div class="px-5 py-3 border-b border-gray-100 flex justify-between items-end bg-indigo-50/30">
             <div>
                 <p class="text-xs font-bold text-gray-500 uppercase tracking-widest" id="paper-count">Papers: 0</p>
@@ -406,6 +411,19 @@
             listContainer.scrollTo({
                 top: listContainer.scrollHeight,
                 behavior: 'smooth'
+            });
+        }
+
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
         }
     </script>
