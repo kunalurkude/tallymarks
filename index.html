@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tally Pro</title>
+    <title>Teacher's Tally Pro - Material</title>
     
-    <!-- Google Fonts: Roboto & Material Symbols -->
+    <!-- Google Fonts: Montserrat & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
     
     <!-- Tailwind CSS -->
@@ -18,7 +18,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Roboto', 'sans-serif'],
+                        sans: ['Montserrat', 'sans-serif'],
                     },
                     colors: {
                         primary: '#6200EE',
@@ -66,55 +66,30 @@
             <span class="material-symbols-rounded text-3xl">calculate</span>
             <h1 class="text-xl font-medium tracking-wide">Tally Pro</h1>
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-2">
             
             <!-- Dynamic Timing Selector -->
-            <div class="relative flex items-center bg-white/10 rounded-full hover:bg-white/20 transition-colors px-2 py-1 mr-1 shadow-inner" title="Set Auto-Add Speed">
+            <div class="relative flex items-center bg-white/10 rounded-full hover:bg-white/20 transition-colors px-2 py-1 shadow-inner" title="Set Auto-Add Speed">
                 <span class="material-symbols-rounded text-[18px] mr-1 opacity-80">speed</span>
-                <select id="timer-delay-select" class="bg-transparent text-white text-sm font-bold outline-none appearance-none cursor-pointer pr-5 relative z-10 w-[3ch]">
+                <select id="timer-delay-select" class="bg-transparent text-white text-sm font-bold outline-none appearance-none cursor-pointer pr-5 relative z-10 w-[4ch]">
+                    <option value="500" class="text-gray-900 font-medium" selected>0.5s</option>
                     <option value="1000" class="text-gray-900 font-medium">1s</option>
                     <option value="2000" class="text-gray-900 font-medium">2s</option>
                     <option value="3000" class="text-gray-900 font-medium">3s</option>
-                    <option value="4000" class="text-gray-900 font-medium">4s</option>
-                    <option value="5000" class="text-gray-900 font-medium" selected>5s</option>
-                    <option value="10000" class="text-gray-900 font-medium">10s</option>
+                    <option value="custom" class="text-gray-900 font-medium italic">Custom...</option>
                 </select>
                 <span class="material-symbols-rounded text-[16px] absolute right-1.5 pointer-events-none opacity-80">arrow_drop_down</span>
             </div>
 
-            <button id="toggle-auto-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center" title="Toggle Auto-Add">
-                <span class="material-symbols-rounded" id="auto-icon">timer</span>
-            </button>
-            <button id="export-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center disabled:opacity-50" title="Export CSV">
-                <span class="material-symbols-rounded">download</span>
-            </button>
-            <button id="clear-btn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors flex items-center justify-center disabled:opacity-50" title="Clear All Marks">
+            <!-- Single prominent clear button for new calculations -->
+            <button id="clear-btn" class="p-2 rounded-full bg-error/80 hover:bg-error active:bg-error/90 transition-colors flex items-center justify-center disabled:opacity-50 disabled:bg-transparent disabled:text-white/50" title="Clear All Marks (New Tally)">
                 <span class="material-symbols-rounded">delete_sweep</span>
-            </button>
-            <button id="full-reset-btn" class="p-2 rounded-full hover:bg-error/80 active:bg-error transition-colors flex items-center justify-center" title="Full App Reset">
-                <span class="material-symbols-rounded">restart_alt</span>
             </button>
         </div>
     </header>
 
-    <!-- Auto-Add Status Banner -->
-    <div id="status-banner" class="bg-primary-dark text-white text-xs py-1 px-4 text-center font-medium shadow-inner transition-all duration-300 h-6 overflow-hidden">
-        Auto-add is enabled (5 seconds)
-    </div>
-
-    <!-- Sticky Grand Total Card -->
-    <div class="bg-surface px-5 py-4 shadow-sm z-10 shrink-0 flex justify-between items-center border-b border-gray-200">
-        <div>
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest" id="paper-count">Papers: 0</p>
-            <p class="text-sm font-medium text-gray-600 mt-1">Grand Total</p>
-        </div>
-        <div class="text-4xl font-bold text-primary" id="grand-total">
-            0
-        </div>
-    </div>
-
     <!-- Scrollable List Area -->
-    <main id="list-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+    <main id="list-container" class="flex-1 overflow-y-auto p-4 space-y-3">
         <!-- Empty State -->
         <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400">
             <span class="material-symbols-rounded text-6xl mb-2 opacity-50">post_add</span>
@@ -123,15 +98,27 @@
         <!-- Entries will be injected here -->
     </main>
 
-    <!-- Bottom Input Area (Material Surface) -->
-    <footer class="bg-surface shadow-[0_-4px_16px_rgba(0,0,0,0.08)] z-20 shrink-0 relative pb-safe">
+    <!-- Bottom Action Area (Sticky at the bottom) -->
+    <footer class="bg-surface shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-20 shrink-0 relative flex flex-col pb-safe">
         
+        <!-- MOVED HERE: Grand Total Card -->
+        <div class="px-5 py-3 border-b border-gray-100 flex justify-between items-end bg-indigo-50/30">
+            <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest" id="paper-count">Papers: 0</p>
+                <p class="text-sm font-medium text-gray-600 mt-0.5">Grand Total</p>
+            </div>
+            <div class="text-4xl font-bold text-primary tracking-tight" id="grand-total">
+                0
+            </div>
+        </div>
+
         <!-- Timer Progress Indicator -->
-        <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 overflow-hidden">
+        <div class="w-full h-1.5 bg-gray-200 overflow-hidden shrink-0">
             <div id="timer-bar" class="h-full bg-secondary w-0 origin-left"></div>
         </div>
 
-        <div class="p-4 flex gap-3 max-w-md mx-auto items-center">
+        <!-- Input Section -->
+        <div class="p-4 flex gap-3 max-w-md w-full mx-auto items-center">
             <div class="relative flex-1">
                 <input
                     id="mark-input"
@@ -145,7 +132,7 @@
             <!-- Material FAB (Floating Action Button) -->
             <button 
                 id="add-btn"
-                class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center shadow-md active:shadow-sm active:translate-y-[1px] disabled:opacity-50 disabled:bg-gray-400 transition-all ripple"
+                class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center shadow-md active:shadow-sm active:translate-y-[1px] disabled:opacity-50 disabled:bg-gray-400 transition-all ripple shrink-0"
                 disabled
             >
                 <span class="material-symbols-rounded text-3xl">add</span>
@@ -157,9 +144,8 @@
     <script>
         // --- State ---
         let entries = [];
-        let autoAddEnabled = true;
         let autoAddTimeout = null;
-        let autoAddDelay = 5000; // Default to 5 seconds
+        let autoAddDelay = 500; // Default to 0.5 seconds (500ms)
         let editingId = null;
 
         // --- DOM Elements ---
@@ -170,16 +156,12 @@
         const grandTotalEl = document.getElementById('grand-total');
         const paperCountEl = document.getElementById('paper-count');
         const timerBar = document.getElementById('timer-bar');
-        const toggleAutoBtn = document.getElementById('toggle-auto-btn');
         const timerDelaySelect = document.getElementById('timer-delay-select');
-        const autoIcon = document.getElementById('auto-icon');
-        const statusBanner = document.getElementById('status-banner');
-        const exportBtn = document.getElementById('export-btn');
         const clearBtn = document.getElementById('clear-btn');
-        const fullResetBtn = document.getElementById('full-reset-btn');
 
         // --- Initialization ---
         input.focus();
+        renderList(); // Call once to set initial button states
 
         // --- Event Listeners ---
         input.addEventListener('input', handleInput);
@@ -191,18 +173,41 @@
         });
         
         addBtn.addEventListener('click', addMark);
-        toggleAutoBtn.addEventListener('click', toggleAutoAdd);
         clearBtn.addEventListener('click', clearAll);
-        exportBtn.addEventListener('click', exportCSV);
-        fullResetBtn.addEventListener('click', fullReset);
         
         // Listen for user changing the delay timer speed
         timerDelaySelect.addEventListener('change', (e) => {
-            autoAddDelay = parseInt(e.target.value);
-            updateBannerText();
+            if (e.target.value === 'custom') {
+                const userVal = prompt("Enter custom timer in seconds (e.g., 0.8, 1.5):");
+                if (userVal !== null && userVal.trim() !== '') {
+                    const parsedSecs = parseFloat(userVal);
+                    if (!isNaN(parsedSecs) && parsedSecs >= 0.1) {
+                        const newDelayMs = Math.round(parsedSecs * 1000);
+                        autoAddDelay = newDelayMs;
+                        
+                        // Check if option already exists, if not create it
+                        let optionExists = Array.from(timerDelaySelect.options).some(opt => opt.value == newDelayMs);
+                        if (!optionExists) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = newDelayMs;
+                            newOpt.text = parsedSecs + 's';
+                            newOpt.className = "text-gray-900 font-medium";
+                            timerDelaySelect.insertBefore(newOpt, timerDelaySelect.querySelector('option[value="custom"]'));
+                        }
+                        timerDelaySelect.value = newDelayMs;
+                    } else {
+                        alert("Invalid number. Please enter a valid seconds value (min 0.1).");
+                        timerDelaySelect.value = autoAddDelay; // Revert back
+                    }
+                } else {
+                    timerDelaySelect.value = autoAddDelay; // Revert back if cancelled
+                }
+            } else {
+                autoAddDelay = parseInt(e.target.value);
+            }
             
             // If currently typing, restart timer with new delay immediately
-            if (autoAddEnabled && input.value.trim() !== '') {
+            if (input.value.trim() !== '') {
                 clearAutoTimer();
                 startAutoTimer();
             }
@@ -211,14 +216,6 @@
 
         // --- Core Functions ---
 
-        function updateBannerText() {
-            if (autoAddEnabled) {
-                statusBanner.innerText = `Auto-add is enabled (${autoAddDelay / 1000} seconds)`;
-            } else {
-                statusBanner.innerText = 'Auto-add is paused';
-            }
-        }
-
         function handleInput(e) {
             const val = e.target.value.trim();
             addBtn.disabled = val === '';
@@ -226,7 +223,7 @@
             // Reset Timer whenever user types
             clearAutoTimer();
 
-            if (val !== '' && autoAddEnabled) {
+            if (val !== '') {
                 startAutoTimer();
             }
         }
@@ -260,37 +257,6 @@
             timerBar.style.width = '0%';
         }
 
-        function toggleAutoAdd() {
-            autoAddEnabled = !autoAddEnabled;
-            
-            if (autoAddEnabled) {
-                autoIcon.innerText = 'timer';
-                autoIcon.classList.remove('opacity-50');
-                statusBanner.classList.remove('bg-gray-600', 'h-0', 'py-0');
-                statusBanner.classList.add('bg-primary-dark', 'h-6', 'py-1');
-                updateBannerText();
-                
-                // If there's text in input, start timer immediately
-                if (input.value.trim() !== '') startAutoTimer();
-            } else {
-                autoIcon.innerText = 'timer_off';
-                autoIcon.classList.add('opacity-50');
-                statusBanner.classList.remove('bg-primary-dark');
-                statusBanner.classList.add('bg-gray-600');
-                updateBannerText();
-                
-                // Hide banner after 2 seconds
-                setTimeout(() => {
-                    if(!autoAddEnabled) {
-                        statusBanner.classList.add('h-0', 'py-0');
-                    }
-                }, 2000);
-
-                clearAutoTimer();
-            }
-            input.focus();
-        }
-
         function addMark() {
             const markValue = parseFloat(input.value);
             
@@ -321,7 +287,7 @@
 
         function clearAll() {
             if (entries.length === 0) return;
-            if (confirm("Clear all marks? This cannot be undone.")) {
+            if (confirm("Clear all marks and start a new calculation?")) {
                 entries = [];
                 input.value = '';
                 addBtn.disabled = true;
@@ -329,47 +295,6 @@
                 renderList();
             }
             input.focus();
-        }
-
-        function fullReset() {
-            if (confirm("Perform a full reset? This will clear all marks and restore default settings.")) {
-                // Clear marks
-                entries = [];
-                input.value = '';
-                addBtn.disabled = true;
-                clearAutoTimer();
-                
-                // Reset settings to default
-                autoAddDelay = 5000;
-                timerDelaySelect.value = "5000";
-                
-                // Re-enable auto add if it was disabled
-                if (!autoAddEnabled) {
-                    toggleAutoAdd(); // This toggles it back to true and updates the UI
-                } else {
-                    updateBannerText();
-                }
-                
-                renderList();
-            }
-            input.focus();
-        }
-
-        function exportCSV() {
-            if (entries.length === 0) return;
-
-            const total = entries.reduce((sum, e) => sum + e.mark, 0);
-            let csvContent = "data:text/csv;charset=utf-8,Entry Number,Mark\n";
-            entries.forEach(e => { csvContent += `${e.number},${e.mark}\n`; });
-            csvContent += `\nTotal,${total}`;
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "tally_pro_material.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
 
         // --- Inline Editing Functions ---
@@ -403,7 +328,6 @@
             paperCountEl.innerText = `Papers: ${entries.length}`;
             
             // Update Header Buttons
-            exportBtn.disabled = entries.length === 0;
             clearBtn.disabled = entries.length === 0;
 
             // Clear current list
