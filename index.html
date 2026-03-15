@@ -299,8 +299,8 @@
             // Reset Timer whenever user types
             clearAutoTimer();
 
-            // Only start timer if there is a valid number (not just a lonely decimal point)
-            if (val !== '' && val !== '.') {
+            // Pause timer if user types a decimal point (wait for the next digit)
+            if (val !== '' && !val.endsWith('.')) {
                 startAutoTimer();
             }
         }
