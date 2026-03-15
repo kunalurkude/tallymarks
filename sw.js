@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tally-pro-v2';
+const CACHE_NAME = 'tally-pro-v3';
 
 // The files we want to save offline
 const ASSETS_TO_CACHE = [
