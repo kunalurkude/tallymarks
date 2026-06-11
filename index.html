@@ -1,481 +1,500 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- STRICT MOBILE VIEWPORT: Prevents accidental zooming on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flashfuse Labs | Progressive Web Apps</title>
+    <title>Teacher's Tally Pro</title>
     
-    <!-- Tab Logo / Favicon (Explicit pathing to fix loading loop) -->
-    <link rel="icon" type="image/png" href="./logo.png">
-    <link rel="apple-touch-icon" href="./logo.png">
-    <link rel="shortcut icon" href="./logo.png">
-
-    <!-- ========================================== -->
-    <!--                 SEO BRAIN                  -->
-    <!-- ========================================== -->
-    <meta name="description" content="Kunal Urkude is the lead developer and founder of Flashfuse Labs. We build high-performance, minimalist Progressive Web Apps (PWAs) and scalable web solutions.">
-    <meta name="keywords" content="Kunal Urkude, Flashfuse Labs, React Developer, Progressive Web Apps, PWA Developer, Frontend Engineer, Web Development">
-    <meta name="author" content="Kunal Urkude">
-    <!-- URLs updated to point to /flashfuse/ -->
-    <link rel="canonical" href="https://kunalurkude.github.io/flashfuse/">
-
-    <!-- Google Site Verification -->
-    <meta name="google-site-verification" content="7dd0148a682d8e17" />
-
-    <!-- Open Graph / Facebook / LinkedIn -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kunalurkude.github.io/flashfuse/">
-    <meta property="og:title" content="Flashfuse Labs | Progressive Web Apps by Kunal Urkude">
-    <meta property="og:description" content="Engineering high-performance applications, minimal interfaces, and robust Progressive Web Apps designed for the modern web.">
-    <meta property="og:image" content="https://kunalurkude.github.io/flashfuse/logo.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://kunalurkude.github.io/flashfuse/">
-    <meta property="twitter:title" content="Flashfuse Labs | Progressive Web Apps">
-    <meta property="twitter:description" content="Engineering high-performance applications, minimal interfaces, and robust Progressive Web Apps designed for the modern web.">
-    <meta property="twitter:image" content="https://kunalurkude.github.io/flashfuse/logo.png">
-    <!-- ========================================== -->
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#6200EE">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     
-    <!-- Google Fonts: Montserrat -->
+    <!-- Google Fonts: Montserrat & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6200EE',
+                        'primary-dark': '#3700B3',
+                        secondary: '#03DAC6',
+                        background: '#F5F5F6',
+                        surface: '#FFFFFF',
+                        error: '#B00020'
                     }
                 }
             }
         }
     </script>
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Custom Animations & Effects */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+        /* Hide arrows on number inputs (for inline editing) */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
-        .animate-float {
-            animation: float 5s ease-in-out infinite;
-        }
-
-        /* 3D Spotlight Card Effects */
-        .spotlight-card {
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out, border-color 0.3s ease;
-        }
-        .spotlight-glow {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1;
-        }
-        .spotlight-card:hover .spotlight-glow {
-            opacity: 1;
-        }
-        .spotlight-content {
-            transform: translateZ(30px);
-            transform-style: preserve-3d;
+        input[type="number"] {
+            -moz-appearance: textfield;
         }
         
-        /* Shimmer sweep effect */
-        .shimmer-sweep {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        /* Material Ripple Effect Setup */
+        .ripple {
+            background-position: center;
+            transition: background 0.5s;
         }
-        .dark .shimmer-sweep {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        .ripple:hover {
+            background: #ffffff22 radial-gradient(circle, transparent 1%, #ffffff22 1%) center/15000%;
+        }
+        .ripple:active {
+            background-color: #ffffff44;
+            background-size: 100%;
+            transition: background 0s;
         }
 
-        /* Hide scrollbar for clean look */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        /* Numpad Active Animation */
+        .numpad-btn:active {
+            transform: scale(0.95);
+            background-color: #E5E7EB; /* Tailwind gray-200 */
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-neutral-950 text-slate-900 dark:text-white selection:bg-red-500/20 selection:text-red-900 dark:selection:text-white transition-colors duration-300 relative overflow-x-hidden min-h-screen">
+<body class="bg-background text-gray-900 h-[100dvh] flex flex-col overflow-hidden select-none">
 
-    <!-- NAVIGATION -->
-    <nav class="fixed w-full z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-neutral-900 transition-colors">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center cursor-pointer group gap-3" onclick="scrollToSection('home')">
-                    
-                    <!-- BRAND LOGO (this.onerror=null added to prevent loops) -->
-                    <img src="./logo.png" 
-                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=FL&background=ef4444&color=fff&rounded=true&bold=true'" 
-                         alt="Flashfuse Logo" 
-                         class="w-10 h-10 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-sm rounded-full object-cover" />
-                    
-                    <span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white transition-colors">
-                        Flashfuse Labs
-                    </span>
-                </div>
-                
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center space-x-8 font-medium text-sm text-slate-500 dark:text-neutral-400">
-                    <button onclick="scrollToSection('home')" class="hover:text-red-600 dark:hover:text-red-500 transition-colors">Home</button>
-                    <button onclick="scrollToSection('projects')" class="hover:text-red-600 dark:hover:text-red-500 transition-colors">Apps</button>
-                    <button onclick="scrollToSection('capabilities')" class="hover:text-red-600 dark:hover:text-red-500 transition-colors">Edge</button>
-                    <button onclick="scrollToSection('about')" class="hover:text-red-600 dark:hover:text-red-500 transition-colors">About</button>
-                    <button onclick="scrollToSection('contact')" class="text-slate-900 dark:text-white font-semibold hover:text-red-600 dark:hover:text-red-500 transition-colors">Contact</button>
-                    
-                    <button class="theme-toggle p-2 rounded-full bg-slate-100 dark:bg-neutral-900 text-slate-600 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all" aria-label="Toggle Dark Mode">
-                        <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
-                        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Buttons -->
-                <div class="md:hidden flex items-center gap-4">
-                    <button class="theme-toggle p-2 rounded-full bg-slate-100 dark:bg-neutral-900 text-slate-600 dark:text-neutral-300 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
-                        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                    </button>
-                    <button id="mobile-menu-btn" class="text-slate-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-500 transition-colors p-2">
-                        <i data-lucide="menu" class="w-6 h-6 menu-icon"></i>
-                        <i data-lucide="x" class="w-6 h-6 close-icon hidden"></i>
-                    </button>
-                </div>
-            </div>
+    <!-- Material App Bar -->
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary text-white shadow-md z-50 flex justify-between items-center px-4 h-[64px]">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-3xl">calculate</span>
+            <h1 class="text-xl font-medium tracking-wide">Tally Pro</h1>
         </div>
-
-        <!-- Mobile Nav Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-neutral-900 border-t border-slate-100 dark:border-neutral-800 shadow-xl absolute w-full transition-colors">
-            <div class="px-4 py-4 space-y-1 font-medium text-slate-500 dark:text-neutral-400">
-                <button onclick="scrollToSection('home'); toggleMenu();" class="block w-full text-left px-4 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-red-600 dark:hover:text-red-500 transition-all">Home</button>
-                <button onclick="scrollToSection('projects'); toggleMenu();" class="block w-full text-left px-4 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-red-600 dark:hover:text-red-500 transition-all">Apps</button>
-                <button onclick="scrollToSection('capabilities'); toggleMenu();" class="block w-full text-left px-4 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-red-600 dark:hover:text-red-500 transition-all">Capabilities</button>
-                <button onclick="scrollToSection('about'); toggleMenu();" class="block w-full text-left px-4 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-neutral-800 hover:text-red-600 dark:hover:text-red-500 transition-all">About</button>
-                <button onclick="scrollToSection('contact'); toggleMenu();" class="block w-full text-left px-4 py-3 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 mt-2 transition-all">Contact</button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section id="home" class="relative pt-28 pb-16 md:pt-36 md:pb-20 px-4 max-w-7xl mx-auto flex flex-col justify-center min-h-[85vh] overflow-hidden">
-        <div id="hero-blob-1" class="absolute top-1/4 right-10 md:right-32 w-64 h-64 md:w-[400px] md:h-[400px] bg-red-300 dark:bg-red-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-30 dark:opacity-20 -z-10 transition-transform duration-100 ease-out"></div>
-        <div id="hero-blob-2" class="absolute bottom-1/4 left-5 md:left-20 w-48 h-48 md:w-[300px] md:h-[300px] bg-red-200 dark:bg-red-600 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-40 dark:opacity-20 -z-10 transition-transform duration-100 ease-out"></div>
-
-        <!-- 2-Column Hero Layout -->
-        <div class="relative z-10 w-full flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12">
+        <div class="flex items-center gap-2">
             
-            <!-- Left: Text Content -->
-            <div class="flex-1 text-center md:text-left flex flex-col items-center md:items-start">
-                <h1 class="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5rem] font-bold tracking-tight mb-6 text-slate-900 dark:text-white leading-[1.1]">
-                    We build <br class="hidden md:block"/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-400 dark:from-red-500 dark:to-red-800">Progressive Web Apps</span> <br/>
-                    that flow seamlessly.
-                </h1>
-                
-                <p class="text-lg md:text-xl text-slate-600 dark:text-neutral-400 mb-8 max-w-xl leading-relaxed">
-                    Engineering high-performance applications, minimal interfaces, and robust Progressive Web Apps designed for the modern web.
-                </p>
-                
-                <div class="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4">
-                    <button onclick="scrollToSection('projects')" class="bg-red-600 text-white rounded-full px-8 py-3.5 md:py-4 font-bold flex items-center gap-2 shadow-lg shadow-red-500/20 dark:shadow-red-900/20 hover:bg-red-700 hover:-translate-y-1 transition-all group">
-                        Explore Apps <i data-lucide="chevron-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                    <button onclick="scrollToSection('about')" class="bg-white dark:bg-neutral-900 text-slate-900 dark:text-white rounded-full px-8 py-3.5 md:py-4 font-bold flex items-center gap-2 border border-slate-200 dark:border-neutral-800 hover:bg-slate-50 dark:hover:bg-neutral-800 hover:-translate-y-1 transition-all">
-                        Meet the Developer
-                    </button>
-                </div>
+            <!-- Dynamic Timing Selector with Custom Option -->
+            <div class="relative flex items-center bg-white/10 rounded-full hover:bg-white/20 transition-colors shadow-inner" title="Set Auto-Add Speed">
+                <select id="timer-delay-select" class="bg-transparent text-white text-sm font-bold outline-none appearance-none cursor-pointer pl-4 pr-7 py-1.5 relative z-10 min-w-[70px]">
+                    <option value="500" class="text-gray-900 font-medium" selected>0.5s</option>
+                    <option value="1000" class="text-gray-900 font-medium">1s</option>
+                    <option value="2000" class="text-gray-900 font-medium">2s</option>
+                    <option value="3000" class="text-gray-900 font-medium">3s</option>
+                    <option value="custom" class="text-gray-900 font-medium italic">Custom...</option>
+                </select>
+                <span class="material-symbols-rounded text-[18px] absolute right-2 pointer-events-none opacity-80">arrow_drop_down</span>
             </div>
 
-            <!-- Right: Storyset Illustration -->
-            <div class="flex-1 w-full max-w-[300px] md:max-w-[450px] flex justify-center items-center drop-shadow-2xl animate-float">
-                <img src="./mobile-testing.svg" 
-                     onerror="this.onerror=null; this.src='https://illustrations.popsy.co/red/app-development.svg'" 
-                     alt="Mobile Testing Illustration" 
-                     class="w-full h-auto" />
-            </div>
-
+            <!-- Single prominent clear button for new calculations -->
+            <button id="clear-btn" class="p-2 rounded-full bg-error/80 hover:bg-error active:bg-error/90 transition-colors flex items-center justify-center disabled:opacity-50 disabled:bg-transparent disabled:text-white/50" title="Clear All Marks (New Tally)">
+                <span class="material-symbols-rounded">delete_sweep</span>
+            </button>
         </div>
-    </section>
+    </header>
 
-    <!-- PROJECTS SECTION (Product Cards) -->
-    <section id="projects" class="py-16 md:py-24 px-4 max-w-7xl mx-auto relative overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-400 dark:bg-red-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[150px] opacity-20 -z-10 pointer-events-none"></div>
-
-        <div class="mb-12 text-center relative z-10">
-            <h2 class="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">App Showcase</h2>
-            <p class="text-slate-600 dark:text-neutral-400 text-lg">Featured projects crafted with precision.</p>
+    <!-- Scrollable List Area -->
+    <main id="list-container" class="flex-1 overflow-y-auto p-4 space-y-3 mt-[64px]">
+        <!-- Empty State -->
+        <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400">
+            <span class="material-symbols-rounded text-6xl mb-2 opacity-50">post_add</span>
+            <p class="text-center font-medium">No marks yet.<br/>Type below to start.</p>
         </div>
+        <!-- Entries will be injected here -->
+    </main>
+
+    <!-- Bottom Action Area (Sticky at the bottom) -->
+    <footer class="bg-surface shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-20 shrink-0 relative flex flex-col pb-safe">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 relative z-10 max-w-5xl mx-auto">
+        <!-- Grand Total Card -->
+        <div class="px-5 py-3 border-b border-gray-100 flex justify-between items-end bg-indigo-50/30">
+            <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest" id="paper-count">Papers: 0</p>
+                <p class="text-sm font-medium text-gray-600 mt-0.5">Grand Total</p>
+            </div>
+            <div class="text-4xl font-extrabold text-primary tracking-tight" id="grand-total">
+                0
+            </div>
+        </div>
+
+        <!-- Timer Progress Indicator -->
+        <div class="w-full h-1.5 bg-gray-200 overflow-hidden shrink-0">
+            <div id="timer-bar" class="h-full bg-secondary w-0 origin-left"></div>
+        </div>
+
+        <!-- Input Section (Digital Display Style) -->
+        <div class="px-4 pt-4 pb-2 flex gap-3 max-w-md w-full mx-auto items-center">
+            <div class="relative flex-1">
+                <input
+                    id="mark-input"
+                    type="text"
+                    readonly
+                    placeholder="0"
+                    class="w-full bg-indigo-50/60 border-2 border-primary/20 rounded-2xl px-4 py-3 text-4xl font-bold text-primary text-center focus:outline-none transition-colors shadow-inner tracking-wider"
+                />
+            </div>
             
-            <!-- App 1: Tally Pro -->
-            <div class="group flex flex-col bg-white dark:bg-neutral-900 rounded-[2rem] border border-slate-200 dark:border-neutral-800 overflow-hidden hover:shadow-2xl hover:shadow-red-500/10 dark:hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-2">
-                <div class="h-48 bg-slate-50 dark:bg-neutral-950 relative flex items-center justify-center overflow-hidden border-b border-slate-100 dark:border-neutral-800">
-                    <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-100 dark:from-neutral-900 to-transparent opacity-80"></div>
-                    <div class="relative z-10 w-20 h-20 bg-white dark:bg-neutral-800 rounded-[1.5rem] flex items-center justify-center shadow-md border border-slate-100 dark:border-neutral-700 text-red-500 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                        <i data-lucide="smartphone" class="w-8 h-8 stroke-[1.5]"></i>
-                    </div>
-                    <div class="absolute top-5 left-5 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 dark:text-neutral-300 tracking-wider uppercase border border-slate-200 dark:border-neutral-700 shadow-sm">
-                        React
-                    </div>
-                </div>
-                <div class="p-6 md:p-8 flex flex-col h-full">
-                    <h3 class="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Tally Pro</h3>
-                    <p class="text-slate-600 dark:text-neutral-400 mb-6 flex-grow leading-relaxed text-sm">
-                        A sleek Progressive Web App (PWA) featuring custom timers, offline functionality, and intuitive touch controls.
-                    </p>
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="text-[11px] font-semibold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 px-3 py-1 rounded-lg uppercase tracking-wider">PWA</span>
-                        <span class="text-[11px] font-semibold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 px-3 py-1 rounded-lg uppercase tracking-wider">Tailwind</span>
-                        <span class="text-[11px] font-semibold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 px-3 py-1 rounded-lg uppercase tracking-wider">Storage</span>
-                    </div>
-                    <a href="https://kunalurkude.github.io/tallymarks/" target="_blank" rel="noreferrer" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-red-500/20 dark:shadow-red-900/20 hover:scale-[1.02] active:scale-95">
-                        <span>Open App</span>
-                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- App 2: EV Studio -->
-            <div class="group flex flex-col bg-white dark:bg-neutral-900 rounded-[2rem] border border-slate-200 dark:border-neutral-800 overflow-hidden hover:shadow-2xl hover:shadow-red-500/10 dark:hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-2">
-                <div class="h-48 bg-slate-50 dark:bg-neutral-950 relative flex items-center justify-center overflow-hidden border-b border-slate-100 dark:border-neutral-800">
-                    <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-100 dark:from-neutral-900 to-transparent opacity-80"></div>
-                    <div class="relative z-10 w-20 h-20 bg-white dark:bg-neutral-800 rounded-[1.5rem] flex items-center justify-center shadow-md border border-slate-100 dark:border-neutral-700 text-red-500 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                        <i data-lucide="battery" class="w-8 h-8 stroke-[1.5]"></i>
-                    </div>
-                    <div class="absolute top-5 left-5 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 dark:text-neutral-300 tracking-wider uppercase border border-slate-200 dark:border-neutral-700 shadow-sm">
-                        JavaScript
-                    </div>
-                </div>
-                <div class="p-6 md:p-8 flex flex-col h-full">
-                    <h3 class="text-2xl font-bold mb-2 text-slate-900 dark:text-white">EV Studio Battery Maker</h3>
-                    <p class="text-slate-600 dark:text-neutral-400 mb-6 flex-grow leading-relaxed text-sm">
-                        A specialized web application for configuring and designing electric vehicle battery packs with interactive UI tools.
-                    </p>
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="text-[11px] font-semibold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 px-3 py-1 rounded-lg uppercase tracking-wider">HTML/CSS</span>
-                        <span class="text-[11px] font-semibold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-800 px-3 py-1 rounded-lg uppercase tracking-wider">Interactive UI</span>
-                    </div>
-                    <a href="https://kunalurkude.github.io/battery/" target="_blank" rel="noreferrer" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-red-500/20 dark:shadow-red-900/20 hover:scale-[1.02] active:scale-95">
-                        <span>Open App</span>
-                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                    </a>
-                </div>
-            </div>
-
+            <!-- Manual Add Button -->
+            <button 
+                id="add-btn"
+                class="bg-primary text-white rounded-2xl w-[72px] h-[64px] flex items-center justify-center shadow-md active:shadow-sm active:translate-y-[1px] disabled:opacity-50 disabled:bg-gray-400 transition-all ripple shrink-0"
+                disabled
+            >
+                <span class="material-symbols-rounded text-4xl">add</span>
+            </button>
         </div>
-    </section>
 
-    <!-- CORE CAPABILITIES (Spotlight Section) -->
-    <section id="capabilities" class="py-16 md:py-24 px-4 max-w-7xl mx-auto relative z-10">
-        <div class="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-xl shadow-slate-200/50 dark:shadow-black/50 transition-colors">
+        <!-- Custom Numpad Grid -->
+        <div class="px-4 pb-4 pt-1 grid grid-cols-3 gap-2 max-w-md w-full mx-auto">
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="1">1</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="2">2</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="3">3</button>
             
-            <div class="pointer-events-none absolute inset-0 dark:hidden opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px); background-size: 24px 24px;"></div>
-
-            <div class="relative mb-10 flex flex-col gap-2 text-center md:text-left">
-                <p class="font-bold text-xs text-red-600 dark:text-red-500 uppercase tracking-[0.2em]">The Flashfuse Edge</p>
-                <h2 class="font-bold text-3xl md:text-4xl text-slate-900 tracking-tight dark:text-white">Why use our tools</h2>
-            </div>
-
-            <div class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="capabilities-grid">
-                <!-- Cards generated via JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- ABOUT SECTION -->
-    <section id="about" class="py-16 md:py-24 px-4 max-w-7xl mx-auto">
-        <div class="bg-white dark:bg-neutral-900 rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border border-slate-200 dark:border-neutral-800 flex flex-col md:flex-row items-center gap-8 md:gap-12 shadow-xl shadow-slate-200/50 dark:shadow-black/50 transition-colors">
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="4">4</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="5">5</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="6">6</button>
             
-            <!-- PROFILE IMAGE -->
-            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full flex-shrink-0 shadow-xl border-4 border-white dark:border-neutral-800 overflow-hidden relative group">
-                <img src="./kunal.jpg" 
-                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Kunal+Urkude&background=ef4444&color=fff&size=256'" 
-                     alt="Kunal Urkude" 
-                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            </div>
-
-            <div class="text-center md:text-left">
-                <h2 class="text-sm font-bold text-red-500 tracking-widest uppercase mb-1.5">Lead Developer</h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Kunal Urkude</h3>
-                <p class="text-slate-600 dark:text-neutral-400 md:text-lg leading-relaxed max-w-2xl mb-6">
-                    I am the founder and lead engineer at Flashfuse Labs. My philosophy is simple: technology should get out of the user's way. I specialize in crafting clean, intuitive, and lightning-fast web applications using React and modern frontend architectures. Every app showcased here represents a commitment to elegant code and neuminimalist design.
-                </p>
-                
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-6">
-                    <a href="https://kunalurkude.super.site" target="_blank" rel="noreferrer" class="p-3 bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-500 transition-colors shadow-sm dark:shadow-none" aria-label="Personal Portfolio">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-                    </a>
-                    <a href="https://www.youtube.com/@kunalurkude" target="_blank" rel="noreferrer" class="p-3 bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-500 transition-colors shadow-sm dark:shadow-none" aria-label="YouTube Channel">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
-                    </a>
-                    <a href="https://www.linkedin.com/in/kunalurkude" target="_blank" rel="noreferrer" class="p-3 bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-500 transition-colors shadow-sm dark:shadow-none" aria-label="LinkedIn Profile">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-                    </a>
-                    <a href="https://x.com/kunalurkude7" target="_blank" rel="noreferrer" class="p-3 bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-500 transition-colors shadow-sm dark:shadow-none" aria-label="X (Twitter) Profile">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
-                    </a>
-                </div>
-
-                <button onclick="scrollToSection('contact')" class="text-red-600 dark:text-red-500 font-semibold flex items-center gap-2 hover:gap-3 transition-all mx-auto md:mx-0">
-                    Let's connect <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                </button>
-            </div>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="7">7</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="8">8</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="9">9</button>
+            
+            <button class="numpad-btn bg-gray-50 border border-gray-200 shadow-sm rounded-2xl h-[56px] text-3xl font-bold text-gray-800 transition-transform" data-val=".">.</button>
+            <button class="numpad-btn bg-white border border-gray-200 shadow-sm rounded-2xl h-[56px] text-2xl font-bold text-gray-800 transition-transform" data-val="0">0</button>
+            <button class="numpad-btn bg-red-50 border border-red-100 shadow-sm rounded-2xl h-[56px] text-error flex items-center justify-center transition-transform" data-val="backspace">
+                <span class="material-symbols-rounded text-2xl pointer-events-none">backspace</span>
+            </button>
         </div>
-    </section>
-
-    <!-- CONTACT SECTION -->
-    <section id="contact" class="py-20 md:py-28 px-4 max-w-3xl mx-auto text-center">
-        <!-- Storyset Illustration for Contact/Message -->
-        <div class="w-32 h-32 md:w-40 md:h-40 mx-auto flex items-center justify-center mb-4 animate-float">
-            <img src="./contact.svg" 
-                 onerror="this.onerror=null; this.src='https://illustrations.popsy.co/red/email.svg'" 
-                 alt="Contact Illustration" 
-                 class="w-full h-auto drop-shadow-xl" />
-        </div>
-
-        <h3 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Ready to build something?</h3>
-        <p class="text-slate-600 dark:text-neutral-400 mb-8 md:text-lg leading-relaxed">
-            Whether you have a fully formed project or just an idea, I'm currently taking on new clients. Let's create an elegant, high-performing app together.
-        </p>
-        
-        <div class="flex flex-col items-center justify-center gap-4">
-            <a href="mailto:kunalurkudeatwork@gmail.com" class="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-4 rounded-full font-medium shadow-lg shadow-red-500/20 dark:shadow-red-900/20 hover:bg-red-700 hover:-translate-y-1 transition-all">
-                Get in Touch
-            </a>
-            <a href="mailto:kunalurkudeatwork@gmail.com" class="text-slate-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-500 transition-colors text-sm font-medium">
-                kunalurkudeatwork@gmail.com
-            </a>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="py-8 text-center border-t border-slate-200 dark:border-neutral-800 transition-colors">
-        <p class="text-slate-500 dark:text-neutral-500 text-sm font-medium">
-            &copy; <span id="year"></span> Flashfuse Labs. Built by Kunal Urkude.
-        </p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JavaScript Logic -->
     <script>
-        // 1. Data Definitions
-        const capabilities = [
-            { icon: 'code', title: "Free & Open Source", description: "Completely transparent and free to use. Inspect the code, contribute, or fork it for your own needs.", color: "#ef4444" },
-            { icon: 'wifi-off', title: "Offline Capable", description: "Installable as Progressive Web Apps (PWAs). Keep using our tools seamlessly even without an internet connection.", color: "#3b82f6" },
-            { icon: 'layout', title: "Intuitive & Easy", description: "Zero learning curve. Minimalist, distraction-free interfaces designed so you can focus on getting things done.", color: "#10b981" },
-            { icon: 'zap', title: "Lightning Fast", description: "No heavy backends or loading spinners. Everything runs smoothly on your device for immediate responses.", color: "#a855f7" },
-            { icon: 'lock', title: "Privacy First", description: "Your data stays yours. We utilize local browser storage so you never have to worry about cloud data breaches.", color: "#0ea5e9" },
-            { icon: 'smartphone', title: "Cross-Platform", description: "Works perfectly on any device. Mobile, tablet, or desktop—just open your browser and you're good to go.", color: "#f43f5e" }
-        ];
+        // --- State ---
+        let entries = [];
+        let autoAddTimeout = null;
+        let autoAddDelay = 500; // Default to 0.5 seconds (500ms)
+        let editingId = null;
 
-        // 2. DOM Generation (Capabilities Spotlight Cards)
-        const capGrid = document.getElementById('capabilities-grid');
-        capabilities.forEach(item => {
-            const card = document.createElement('div');
-            card.className = "spotlight-card group relative flex flex-col gap-4 overflow-hidden rounded-3xl border p-6 border-slate-200 bg-white shadow-lg shadow-slate-200/40 dark:border-white/10 dark:bg-white/5 dark:shadow-none transition-colors hover:border-slate-300 dark:hover:border-white/20";
-            card.style.perspective = "900px";
-            card.style.setProperty('--card-color', item.color);
-            
-            card.innerHTML = `
-                <div class="pointer-events-none absolute inset-0 rounded-3xl" style="background: radial-gradient(ellipse at 20% 20%, ${item.color}14, transparent 65%)"></div>
-                <div class="spotlight-glow pointer-events-none absolute inset-0 rounded-3xl" style="background: radial-gradient(ellipse at var(--mouse-x, 50%) var(--mouse-y, 50%), ${item.color}2e, transparent 65%)"></div>
-                <div class="shimmer-sweep pointer-events-none absolute inset-y-0 left-0 w-[55%] -translate-x-full -skew-x-12 transition-transform duration-700 ease-out group-hover:translate-x-[280%] z-0"></div>
-                
-                <div class="spotlight-content relative z-10 flex flex-col gap-2 h-full">
-                    <div class="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl md:rounded-2xl mb-2 md:mb-3" style="background: ${item.color}18; box-shadow: inset 0 0 0 1px ${item.color}30; color: ${item.color};">
-                        <i data-lucide="${item.icon}" class="w-5 h-5 stroke-[2]"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-slate-900 tracking-tight dark:text-white">${item.title}</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed dark:text-neutral-400">${item.description}</p>
-                </div>
-                <div class="absolute bottom-0 left-0 h-[3px] w-0 rounded-full transition-all duration-500 group-hover:w-full" style="background: linear-gradient(to right, ${item.color}80, transparent)"></div>
-            `;
-            
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                card.style.setProperty('--mouse-x', `${x}px`);
-                card.style.setProperty('--mouse-y', `${y}px`);
+        // --- DOM Elements ---
+        const input = document.getElementById('mark-input');
+        const addBtn = document.getElementById('add-btn');
+        const listContainer = document.getElementById('list-container');
+        const emptyState = document.getElementById('empty-state');
+        const grandTotalEl = document.getElementById('grand-total');
+        const paperCountEl = document.getElementById('paper-count');
+        const timerBar = document.getElementById('timer-bar');
+        const timerDelaySelect = document.getElementById('timer-delay-select');
+        const clearBtn = document.getElementById('clear-btn');
+        const numpadBtns = document.querySelectorAll('.numpad-btn');
 
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -9; 
-                const rotateY = ((x - centerX) / centerX) * 9; 
+        // --- Initialization ---
+        renderList(); 
 
-                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        // --- Numpad Logic ---
+        numpadBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Ignore numpad if we are in inline-editing mode
+                if (editingId !== null) return; 
+
+                // Haptic feedback for supported devices
+                if (navigator.vibrate) navigator.vibrate(20);
+
+                const val = btn.dataset.val;
+
+                if (val === 'backspace') {
+                    input.value = input.value.slice(0, -1);
+                } else if (val === '.') {
+                    if (!input.value.includes('.')) {
+                        input.value += input.value === '' ? '0.' : '.';
+                    }
+                } else {
+                    // Prevent giant numbers
+                    if (input.value.length < 6) {
+                        input.value += val;
+                    }
+                }
+
+                // Trigger the logic to evaluate the new value
+                handleInput();
             });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-            });
-
-            capGrid.appendChild(card);
         });
 
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        // --- Physical Keyboard Fallback (for PC/Tablets) ---
+        document.addEventListener('keydown', (e) => {
+            // Ignore if inline-editing (let the native input handle it)
+            if (editingId !== null) return;
 
-        // 4. UI Interactions
-        document.getElementById('year').innerText = new Date().getFullYear();
+            const key = e.key;
+            if (/[0-9]/.test(key)) {
+                if (input.value.length < 6) {
+                    input.value += key;
+                    handleInput();
+                }
+            } else if (key === '.') {
+                if (!input.value.includes('.')) {
+                    input.value += input.value === '' ? '0.' : '.';
+                    handleInput();
+                }
+            } else if (key === 'Backspace') {
+                input.value = input.value.slice(0, -1);
+                handleInput();
+            } else if (key === 'Enter' || key === ' ') {
+                e.preventDefault();
+                addMark();
+            }
+        });
 
-        // Dark Mode Toggle
-        const themeToggles = document.querySelectorAll('.theme-toggle');
-        const htmlElement = document.documentElement;
+        // --- Event Listeners ---
+        addBtn.addEventListener('click', addMark);
+        clearBtn.addEventListener('click', clearAll);
         
-        themeToggles.forEach(btn => {
-            btn.addEventListener('click', () => {
-                htmlElement.classList.toggle('dark');
-            });
+        // Listen for user changing the delay timer speed
+        timerDelaySelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                const userVal = prompt("Enter custom timer in seconds (e.g., 0.8, 1.5):");
+                if (userVal !== null && userVal.trim() !== '') {
+                    const parsedSecs = parseFloat(userVal);
+                    if (!isNaN(parsedSecs) && parsedSecs >= 0.1) {
+                        const newDelayMs = Math.round(parsedSecs * 1000);
+                        autoAddDelay = newDelayMs;
+                        
+                        // Check if option already exists, if not create it
+                        let optionExists = Array.from(timerDelaySelect.options).some(opt => opt.value == newDelayMs);
+                        if (!optionExists) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = newDelayMs;
+                            newOpt.text = parsedSecs + 's';
+                            newOpt.className = "text-gray-900 font-medium";
+                            timerDelaySelect.insertBefore(newOpt, timerDelaySelect.querySelector('option[value="custom"]'));
+                        }
+                        timerDelaySelect.value = newDelayMs;
+                    } else {
+                        alert("Invalid number. Please enter a valid seconds value (min 0.1).");
+                        timerDelaySelect.value = autoAddDelay; // Revert back
+                    }
+                } else {
+                    timerDelaySelect.value = autoAddDelay; // Revert back if cancelled
+                }
+            } else {
+                autoAddDelay = parseInt(e.target.value);
+            }
+            
+            // If currently typing, restart timer with new delay immediately
+            if (input.value !== '') {
+                clearAutoTimer();
+                startAutoTimer();
+            }
         });
 
-        // Mobile Menu Toggle
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuIcon = document.querySelector('.menu-icon');
-        const closeIcon = document.querySelector('.close-icon');
+        // --- Core Functions ---
 
-        function toggleMenu() {
-            mobileMenu.classList.toggle('hidden');
-            menuIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        }
-        mobileBtn.addEventListener('click', toggleMenu);
+        function handleInput() {
+            const val = input.value;
+            addBtn.disabled = val === '';
 
-        // Smooth Scrolling
-        window.scrollToSection = function(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                el.scrollIntoView({ behavior: 'smooth' });
+            // Reset Timer whenever user types
+            clearAutoTimer();
+
+            // Pause timer if user types a decimal point (wait for the next digit)
+            if (val !== '' && !val.endsWith('.')) {
+                startAutoTimer();
             }
         }
 
-        // Hero Mouse Parallax
-        const heroSection = document.getElementById('home');
-        const blob1 = document.getElementById('hero-blob-1');
-        const blob2 = document.getElementById('hero-blob-2');
-        
-        heroSection.addEventListener('mousemove', (e) => {
-            // Disabled on mobile sizes to prevent screen jumping!
-            if (window.innerWidth < 768) return; 
+        function startAutoTimer() {
+            // Reset CSS animation
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
             
-            const x = (e.clientX / window.innerWidth - 0.5) * 40;
-            const y = (e.clientY / window.innerHeight - 0.5) * 40;
-            blob1.style.transform = `translate(${x}px, ${y}px)`;
-            blob2.style.transform = `translate(${-x * 1.5}px, ${-y * 1.5}px)`;
-        });
+            // Force browser reflow to restart animation seamlessly
+            void timerBar.offsetWidth; 
+            
+            // Set dynamic transition duration based on user selection
+            timerBar.style.transition = `width ${autoAddDelay}ms linear`;
+            timerBar.style.width = '0%';
 
+            // Start Countdown
+            autoAddTimeout = setTimeout(() => {
+                if (input.value !== '') {
+                    addMark();
+                }
+            }, autoAddDelay);
+        }
+
+        function clearAutoTimer() {
+            if (autoAddTimeout) {
+                clearTimeout(autoAddTimeout);
+                autoAddTimeout = null;
+            }
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '0%';
+        }
+
+        function addMark() {
+            const markValue = parseFloat(input.value);
+            
+            if (!isNaN(markValue)) {
+                entries.push({
+                    id: Date.now(),
+                    number: entries.length + 1,
+                    mark: markValue
+                });
+                
+                input.value = '';
+                addBtn.disabled = true;
+                clearAutoTimer();
+                renderList();
+            }
+        }
+
+        function deleteEntry(id) {
+            entries = entries.filter(e => e.id !== id);
+            // Re-index entries to keep numbers sequential
+            entries.forEach((e, index) => {
+                e.number = index + 1;
+            });
+            renderList();
+        }
+
+        function clearAll() {
+            if (entries.length === 0) return;
+            if (confirm("Clear all marks and start a new calculation?")) {
+                entries = [];
+                input.value = '';
+                addBtn.disabled = true;
+                clearAutoTimer();
+                renderList();
+            }
+        }
+
+        // --- Inline Editing Functions ---
+        function startEditing(id, currentMark) {
+            // Stop active timers so we don't auto-add the numpad value while editing
+            clearAutoTimer(); 
+            editingId = id;
+            renderList();
+        }
+
+        function saveEdit(id, newValue) {
+            const markValue = parseFloat(newValue);
+            if (!isNaN(markValue)) {
+                const entry = entries.find(e => e.id === id);
+                if(entry) entry.mark = markValue;
+            }
+            editingId = null;
+            renderList();
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            renderList();
+        }
+
+        // --- Rendering ---
+        function renderList() {
+            // Update Totals
+            const total = entries.reduce((sum, e) => sum + e.mark, 0);
+            grandTotalEl.innerText = total % 1 !== 0 ? total.toFixed(2) : total;
+            paperCountEl.innerText = `Papers: ${entries.length}`;
+            
+            // Update Header Buttons
+            clearBtn.disabled = entries.length === 0;
+
+            // Clear current list
+            listContainer.innerHTML = '';
+
+            if (entries.length === 0) {
+                listContainer.appendChild(emptyState);
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Render items
+            entries.forEach(entry => {
+                const itemDiv = document.createElement('div');
+                
+                if (editingId === entry.id) {
+                    // Edit Mode UI
+                    itemDiv.className = "flex items-center justify-between p-2 rounded-xl bg-indigo-50 border border-primary shadow-sm";
+                    itemDiv.innerHTML = `
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xs font-bold text-primary w-6">#${entry.number}</span>
+                            <input 
+                                type="number" 
+                                inputmode="decimal"
+                                value="${entry.mark}" 
+                                id="edit-input-${entry.id}"
+                                class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xl font-bold text-gray-800 focus:ring-2 focus:ring-primary outline-none"
+                            >
+                        </div>
+                        <div class="flex items-center gap-1 ml-2">
+                            <button onclick="saveEdit(${entry.id}, document.getElementById('edit-input-${entry.id}').value)" class="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors">
+                                <span class="material-symbols-rounded">check</span>
+                            </button>
+                            <button onclick="cancelEdit()" class="p-2 text-gray-400 hover:bg-gray-200 rounded-lg transition-colors">
+                                <span class="material-symbols-rounded">close</span>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Auto focus and handle enter/escape for edit field
+                    setTimeout(() => {
+                        const editInput = document.getElementById(`edit-input-${entry.id}`);
+                        editInput.focus();
+                        editInput.select();
+                        editInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') saveEdit(entry.id, editInput.value);
+                            if (e.key === 'Escape') cancelEdit();
+                        });
+                    }, 10);
+
+                } else {
+                    // Normal Mode UI
+                    itemDiv.className = "flex items-center justify-between p-3 rounded-xl bg-surface border border-gray-100 shadow-sm transition-all";
+                    itemDiv.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-bold text-gray-400 w-6">#${entry.number}</span>
+                            <span class="text-xl font-bold text-gray-800">${entry.mark}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <button onclick="startEditing(${entry.id}, ${entry.mark})" class="p-2 text-gray-400 hover:text-primary rounded-lg transition-colors">
+                                <span class="material-symbols-rounded text-[20px]">edit</span>
+                            </button>
+                            <button onclick="deleteEntry(${entry.id})" class="p-2 text-gray-400 hover:text-error rounded-lg transition-colors">
+                                <span class="material-symbols-rounded text-[20px]">delete</span>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                listContainer.appendChild(itemDiv);
+            });
+
+            // Auto-scroll to bottom smoothly
+            listContainer.scrollTo({
+                top: listContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
